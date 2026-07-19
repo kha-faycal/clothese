@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"] ,
+      "@components/*": ["components/*"],
+      "@components/dashboard/": ["@components/dashboard/*"]
     }
   },
   "include": [

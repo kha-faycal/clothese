@@ -1,0 +1,152 @@
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?  // optional if you want credentials login
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+model logecilowner {
+idowner   Int     @id @default(autoincrement())
+name_company String @db.VarChar(255)
+name_owner   String @db.VarChar(255)
+address      String @db.VarChar(255)
+telephone    String @db.VarChar(255)
+mail         String @db.VarChar(255)
+  image      String[]   @db.VarChar(255)
+
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  Name        String   @db.VarChar(255) @unique
+  Slug        String   @db.VarChar(255) @unique
+  Description String   @db.VarChar(255)
+  image      String[]   @db.VarChar(255)
+  ParentId    Int?
+ createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  products    Product[]
+  parent      Category? @relation("CategoryHierarchy", fields: [ParentId], references: [id])
+  children   Category[] @relation("CategoryHierarchy")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  Name        String   @db.VarChar(255)
+  Slug        String   @db.VarChar(255) @unique
+  Description String   @map("description") @db.Text
+  brand       String   @db.VarChar(255)
+  gender      Gender
+  season      Season?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  variants    Variant[]
+  attributes Attribute[]
+}
+model Variant {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  color      String   @db.VarChar(255)
+  size       String   @db.VarChar(255)
+  sku        String   @db.VarChar(255) @unique
+  barcode    String   @db.VarChar(255) @unique
+  price      Float
+  stock      Int
+  weight     Decimal   @db.Decimal(10, 2)
+  image       String[] @db.Text
+orderItems OrderItem[]
+
+  product    Product    @relation(fields: [productId], references: [id])
+}
+model Attribute {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  name        String   @db.VarChar(255)
+  value       String   @db.VarChar(255)
+  product     Product  @relation(fields: [productId], references: [id])
+}
+enum Gender {
+  men
+  women
+  kids
+}
+enum Season {
+  Summer
+  Winter
+  AllSeason
+}
+model Order {
+  id          Int         @id @default(autoincrement())
+  customerName String     @db.VarChar(255)
+  phone       String      @db.VarChar(255)
+  wilaya      String      @db.VarChar(255)
+  commune     String      @db.VarChar(255)
+  totalPrice  Float
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  variantId Int
+  quantity  Int
+  price     Float   // On stocke le prix d'achat exact au moment de la commande
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant   Variant @relation(fields: [variantId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING     // En attente de confirmation téléphonique
+  CONFIRMED   // Confirmé au téléphone
+  SHIPPED     // Expédié / Chez le livreur
+  DELIVERED   // Livré et encaissé
+  CANCELLED   // Annulé
+}
