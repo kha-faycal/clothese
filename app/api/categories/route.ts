@@ -1,19 +1,26 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// Function to handle authentication checks using the new Auth.js structure
 async function checkAdminAuth() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
+  
   if (!session || !session.user) {
-    throw new Error("Non autorisé");
+    return null;
   }
+  
+  return session;
 }
 
 // ➕ AJOUTER UNE CATÉGORIE
 export async function POST(request: Request) {
   try {
-    await checkAdminAuth();
+    const session = await checkAdminAuth();
+    if (!session) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const { name, slug, description, image, parentId } = await request.json();
     
     console.log("Données reçues en route :", name, slug, description, image, parentId);
@@ -60,7 +67,11 @@ export async function POST(request: Request) {
 // ✏️ ÉDITER UNE CATÉGORIE
 export async function PUT(request: Request) {
   try {
-    await checkAdminAuth();
+    const session = await checkAdminAuth();
+    if (!session) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const { id, name, slug, description, image, parentId } = await request.json();
 
     if (!id) {
@@ -98,9 +109,14 @@ export async function PUT(request: Request) {
   }
 }
 
+// 🔍 RÉCUPÉRER LES CATÉGORIES
 export async function GET() {
   try {
-    await checkAdminAuth();     
+    const session = await checkAdminAuth();     
+    if (!session) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const categories = await prisma.category.findMany({
       include: {
         parent: true, 
@@ -108,6 +124,7 @@ export async function GET() {
     });
     return NextResponse.json(categories, { status: 200 });
   } catch (error: any) {
+    console.error("Erreur Prisma GET :", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des catégories." },
       { status: 500 },
