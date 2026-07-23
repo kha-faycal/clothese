@@ -16,7 +16,7 @@ export default function Nav() {
     >
       <div className="flex h-16 justify-between items-center px-6 max-w-7xl mx-auto">
         
-        {/* Liens de navigation principaux */}
+        {/* Main Nav Links */}
         <div className="flex space-x-4 space-x-reverse">
           {[
             { href: "/", label: "الرئيسية" },
@@ -35,7 +35,7 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* Zone utilisateur (Notification + Profil) */}
+        {/* User Interaction Hub */}
         <div className="flex items-center gap-5">
           <button
             type="button"
@@ -54,7 +54,7 @@ export default function Nav() {
                 <MenuButton className="flex rounded-full bg-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] cursor-pointer transition-transform hover:scale-105">
                   <img
                     className="h-9 w-9 rounded-full object-cover border border-[var(--muted)]"
-                    src={session?.user?.image || "https://unsplash.com"}
+                    src={session?.user?.image || "https://dicebear.com" + (session?.user?.name || "User")}
                     alt={session?.user?.name || "Profil"}
                   />
                 </MenuButton>

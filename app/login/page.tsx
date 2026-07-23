@@ -2,122 +2,129 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter} from "next/navigation"; // Ou "next/navigation" selon votre configuration de routage
-import { LockClosedIcon, EnvelopeIcon } from "@heroicons/react/24/solid";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // States for form control
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Retrieve where the user came from (defaults to dashboard if none)
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
+    
+    if (!email || !password) {
+      toast.error("يرجى ملء جميع الحقول المطلوبة.");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
+      // Execute the NextAuth credential flow
+      const result = await signIn("credentials", {
+        redirect: false, // Prevent NextAuth from doing a hard page refresh
+        email: email.toLowerCase().trim(),
+        password: password,
       });
 
-      if (res?.error) {
-        setError("Identifiants invalides. Veuillez réessayer.");
+      if (result?.error) {
+        // Display specific error returned from lib/auth.ts authorize loop
+        toast.error(result.error === "CredentialsSignin" ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" : result.error);
       } else {
-      
-        // Redirection vers le tableau de bord ou la page d'accueil après succès
-        router.push("/");
+        toast.success("تم تسجيل الدخول بنجاح! جاري تحويلك...");
+        
+        // Refresh the router to update navbar states, then move forward
+        router.refresh();
+        router.push(callbackUrl);
       }
     } catch (err) {
-      setError("Une erreur inattendue est survenue.");
+      console.error("Login component submission error:", err);
+      toast.error("حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-   
-  
-    
-      return(
-        <div>
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Connexion à votre compte
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Ou{" "}
-            <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              créez un compte gratuitement
-            </a>
-          </p>
-        </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 font-medium">
-              {error}
-            </div>
-          )}
+  return (
+    <div className="flex min-h-[75vh] flex-col justify-center px-6 py-12 lg:px-8 bg-[var(--background)]" dir="rtl">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-[var(--foreground)]">
+          تسجيل الدخول إلى حسابك
+        </h2>
+      </div>
 
-          <div className="space-y-4 rounded-md">
-            <div>
-              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
-                Adresse email
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <EnvelopeIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </div>
-                <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="exemple@domaine.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Mot de passe
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <LockClosedIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="••••••••"
-                />
-              </div>
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm border border-[var(--border)] p-8 rounded-2xl shadow-xl bg-[var(--background)]">
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Email input field */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold leading-6 text-[var(--foreground)] text-right">
+              البريد الإلكتروني
+            </label>
+            <div className="mt-2">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full rounded-xl border border-[var(--border)] bg-[var(--background)] py-2.5 px-4 text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all text-right"
+                placeholder="example@mail.com"
+              />
             </div>
           </div>
 
+          {/* Password input field */}
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="block text-sm font-semibold leading-6 text-[var(--foreground)] text-right">
+                كلمة المرور
+              </label>
+            </div>
+            <div className="mt-2">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full rounded-xl border border-[var(--border)] bg-[var(--background)] py-2.5 px-4 text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all text-right"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+
+          {/* Action Button */}
           <div>
             <button
               type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 transition-colors"
+              disabled={isLoading}
+              className="flex w-full justify-center rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-[var(--text)] shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Connexion en cours..." : "Se connecter"}
+              {isLoading ? "جاري التحقق..." : "تسجيل الدخول"}
             </button>
           </div>
         </form>
+
+        {/* Link to Registration */}
+        <p className="mt-10 text-center text-sm text-[var(--muted)]">
+          ليس لديك حساب؟{" "}
+          <Link href="/register" className="font-semibold leading-6 text-[var(--primary)] hover:text-red-400 transition-colors">
+            إنشاء حساب جديد من هنا
+          </Link>
+        </p>
       </div>
     </div>
   );
