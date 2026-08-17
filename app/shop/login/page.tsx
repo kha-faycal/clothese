@@ -1,21 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react"; // ✅ Importer Suspense depuis React
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import Link from "next/link";
 
-export default function LoginPage() {
+// 🔵 1. Sous-composant isolé pour consommer useSearchParams de manière sécurisée
+function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // States for form control
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Retrieve where the user came from (defaults to dashboard if none)
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,20 +27,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Execute the NextAuth credential flow
       const result = await signIn("credentials", {
-        redirect: false, // Prevent NextAuth from doing a hard page refresh
+        redirect: false, 
         email: email.toLowerCase().trim(),
         password: password,
       });
 
       if (result?.error) {
-        // Display specific error returned from lib/auth.ts authorize loop
         toast.error(result.error === "CredentialsSignin" ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" : result.error);
       } else {
         toast.success("تم تسجيل الدخول بنجاح! جاري تحويلك...");
-        
-        // Refresh the router to update navbar states, then move forward
         router.refresh();
         router.push(callbackUrl);
       }
@@ -64,7 +58,6 @@ export default function LoginPage() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm border border-[var(--border)] p-8 rounded-2xl shadow-xl bg-[var(--background)]">
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* Email input field */}
           <div>
             <label htmlFor="email" className="block text-sm font-semibold leading-6 text-[var(--foreground)] text-right">
               البريد الإلكتروني
@@ -84,7 +77,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Password input field */}
           <div>
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="block text-sm font-semibold leading-6 text-[var(--foreground)] text-right">
@@ -106,20 +98,26 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Action Button */}
           <div>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex w-full justify-center rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-[var(--text)] shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full justify-center rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-[var(--text)] shadow-sm hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "جاري التحقق..." : "تسجيل الدخول"}
             </button>
           </div>
         </form>
-
-       
       </div>
     </div>
+  );
+}
+
+// 🟢 2. Le composant d'entrée principal qui enveloppe le formulaire dans un bloc Suspense obligatoire
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20 text-xs text-[var(--muted)]">جاري التحميل...</div>}>
+      <LoginFormContent />
+    </Suspense>
   );
 }
