@@ -45,12 +45,12 @@ export default function ProductForm({
       <div className="border-b border-gray-800 pb-6">
         <h3 className="text-lg font-bold text-white mb-4">1. معلومات عامة (Informations Générales)</h3>
         
+        {/* LIGNE 1 : Nom, Slug, Marque */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-400 uppercase">اسم المنتج (Nom)</label>
             <input
               type="text" required placeholder="Ex: T-Shirt Premium" value={product?.name || ""}
-              // 🔴 FIX: Safe functional state updating
               onChange={(e) => setProduct((prev: any) => ({ ...prev, name: e.target.value }))}
               className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none"
             />
@@ -60,21 +60,35 @@ export default function ProductForm({
             <label className="text-xs font-semibold text-gray-400 uppercase">رابط ثابت تلقائي (Slug Auto)</label>
             <input
               type="text" disabled placeholder="auto-generated-slug" value={product?.slug || ""}
-              className="px-3 py-2 text-sm rounded-lg bg-gray-900/40 border border-gray-800 text-gray-500 font-mono outline-none cursor-not-allowed select-none"
+              className="px-3 py-2 text-sm rounded-lg bg-gray-900/40 border border-gray-800 text-gray-500 font-mono outline-none cursor-not-allowed select-none text-left"
             />
           </div>
           
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-400 uppercase">الماركة (Marque)</label>
             <input
-              type="text" placeholder="Ex: Nike, Zara..." value={product?.brand || ""}
+              type="text" placeholder="Ex: Nike, Chanel..." value={product?.brand || ""}
               onChange={(e) => setProduct((prev: any) => ({ ...prev, brand: e.target.value }))}
               className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none"
             />
           </div>
         </div>
 
+        {/* LIGNE 2 : Nature (Type), Catégorie, Genre */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-400 uppercase">طبيعة المنتج (Nature / Type)</label>
+            <select
+              value={product?.type || "CLOTHES"}
+              onChange={(e) => setProduct((prev: any) => ({ ...prev, type: e.target.value }))}
+              className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none appearance-none cursor-pointer"
+            >
+              <option value="CLOTHES" className="bg-gray-900">👕 ملابس (Clothes)</option>
+              <option value="PERFUME" className="bg-gray-900">✨ عطور (Perfume)</option>
+              <option value="COSMETICS" className="bg-gray-900">💄 مواد تجميل (Cosmetics)</option>
+            </select>
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-400 uppercase">الفئة (Catégorie)</label>
             <select
@@ -98,41 +112,47 @@ export default function ProductForm({
               onChange={(e) => setProduct((prev: any) => ({ ...prev, gender: e.target.value }))}
               className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none appearance-none cursor-pointer"
             >
-              <option value="men" className="bg-gray-900">Homme</option>
-              <option value="women" className="bg-gray-900">Femme</option>
-              <option value="kids" className="bg-gray-900">Enfant</option>
+              <option value="men" className="bg-gray-900">رجال (Homme)</option>
+              <option value="women" className="bg-gray-900">نساء (Femme)</option>
+              <option value="kids" className="bg-gray-900">أطفال (Enfant)</option>
+              <option value="unisex" className="bg-gray-900">مشترك (Unisexe / Mixte)</option>
             </select>
           </div>
-          
+        </div>
+
+        {/* LIGNE 3 : Saison conditionnelle & Description */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-400 uppercase">الموسم (Saison Dropdown)</label>
             <select
               value={product?.season || ""}
+              disabled={product?.type !== "CLOTHES"} // Désactivé automatiquement pour les parfums et cosmétiques
               onChange={(e) => setProduct((prev: any) => ({ ...prev, season: e.target.value || null }))}
-              className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none appearance-none cursor-pointer"
+              className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <option value="" className="bg-gray-900 text-gray-500">Aucune saison</option>
+              <option value="" className="bg-gray-900 text-gray-500">Aucune saison (Non applicable)</option>
               <option value="Summer" className="bg-gray-900">الصيف (Summer)</option>
               <option value="Winter" className="bg-gray-900">الشتاء (Winter)</option>
               <option value="AllSeason" className="bg-gray-900">كل الفصول (All Season)</option>
             </select>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-400 uppercase">الوصف (Description)</label>
-          <textarea
-            placeholder="Détails du produit..." value={product?.description || ""}
-            onChange={(e) => setProduct((prev: any) => ({ ...prev, description: e.target.value }))}
-            className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none h-20 resize-none"
-          />
+          <div className="flex flex-col gap-1.5 md:col-span-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase">الوصف (Description)</label>
+            <textarea
+              placeholder="Détails du produit, composition, notes de fond..." value={product?.description || ""}
+              onChange={(e) => setProduct((prev: any) => ({ ...prev, description: e.target.value }))}
+              className="px-3 py-2 text-sm rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none h-11 resize-none"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Sous-formulaires dynamiques passés par référence (gèrent les intitulés dynamiques en interne via product.type) */}
       <VariantForm variants={variants} setVariants={setVariants} />
       <AttributeForm attributes={attributes} setAttributes={setAttributes} />
 
-      <button type="submit" className="bg-white text-black font-semibold text-lg px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors mt-2 cursor-pointer w-full text-center">
+      <button type="submit" className="bg-white text-black font-bold text-lg px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors mt-2 cursor-pointer w-full text-center">
         حفظ المنتج (Enregistrer le Produit)
       </button>
     </form>

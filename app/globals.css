@@ -1,14 +1,25 @@
 @import "tailwindcss";
 
+/* ☀️ MODE CLAIR (Variables par défaut) */
 :root {
-  --background: #111111;
-  --foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #111111;
   --primary: #e63946;
-  --secondary: #ffd166;
-  --border: #333333;
+  --secondary: #f4f4f5;
+  --border: #e5e5e5;
+  --muted: #666666;
+}
+
+/* 🌙 MODE SOMBRE (Forcé par la classe .dark de next-themes) */
+:root:where(.dark), .dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --secondary: #121212;
+  --border: #1f1f1f;
   --muted: #aaaaaa;
 }
 
+/* 🎨 Configuration du moteur de thème de Tailwind v4 */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -16,19 +27,11 @@
   --color-secondary: var(--secondary);
   --color-border: var(--border);
   --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+/* ⚙️ Application stricte au niveau du document */
+html, body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }

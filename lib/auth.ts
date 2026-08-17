@@ -3,13 +3,24 @@ import { getServerSession } from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs"; // ✅ Uniformisation avec bcryptjs
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt",
+    strategy: "jwt", 
   },
   providers: [
     CredentialsProvider({
@@ -31,7 +42,9 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Aucun utilisateur trouvé");
         }
 
+        // ✅ Comparaison native avec bcryptjs sans erreur de parenthèse
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+        
         if (!isPasswordValid) {
           throw new Error("Mot de passe incorrect");
         }
@@ -60,11 +73,10 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: "/shop/login", 
   },
 };
 
-// Main Server Component / Route Handler Session Helper
 export async function auth() {
   return await getServerSession(authOptions);
 }

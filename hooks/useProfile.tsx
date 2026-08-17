@@ -48,18 +48,16 @@ export function useProfile() {
     }
   }, []);
 
-  // Fonction dédiée à l'inscription
   const registerUser = useCallback(
     async (payload: JsonPayload) => {
-      return execute("/api/auth/register", { method: "POST", body: payload });
+      return execute("/api/users", { method: "POST", body: payload });
     },
     [execute]
   );
 
-  // Fonction dédiée à la mise à jour des informations complémentaires du profil
   const updateProfile = useCallback(
-    async (payload: JsonPayload) => {
-      return execute("/api/user/profile", { method: "PUT", body: payload });
+    async (id: string | number, payload: JsonPayload) => {
+      return execute(`/api/users/${id}`, { method: "PUT", body: payload });
     },
     [execute]
   );

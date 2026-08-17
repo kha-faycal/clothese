@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { useCartStore } from "../app/store/useCartStore";
-import { ALGERIA_WILAYAS, Wilaya } from "../app/data/wilayas"; // 🔴 Import des Wilayas
+import { useCartStore } from "../app/shop/store/useCartStore";
+import { ALGERIA_WILAYAS, Wilaya } from "../app/shop/data/wilayas"; // 🔴 Import des Wilayas
 import { toast } from "sonner";
 
 export default function CartDrawer() {

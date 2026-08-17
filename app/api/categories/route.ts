@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// Function to handle authentication checks using the new Auth.js structure
 async function checkAdminAuth() {
   const session = await auth();
   
@@ -112,11 +111,7 @@ export async function PUT(request: Request) {
 // 🔍 RÉCUPÉRER LES CATÉGORIES
 export async function GET() {
   try {
-    const session = await checkAdminAuth();     
-    if (!session) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
-
+    
     const categories = await prisma.category.findMany({
       include: {
         parent: true, 

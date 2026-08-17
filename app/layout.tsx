@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Footer from '@components/Footer';
-import Nav from "../components/Nav"; 
-import AuthProvider from "@/components/AuthProvider";
-import { Toaster } from "sonner"; // 👈 1. Import Toaster from Sonner
-
-import "./globals.css";
+import AuthProvider from "@/components/AuthProvider"; 
+import { ThemeProvider } from "@/components/ThemeProvider"; // 🎯 1. Importation obligatoire du ThemeProvider
+import { Toaster } from "sonner"; 
+import "./globals.css"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Clothese",
-  description: "Welcome to Clothese, your ultimate destination for fashion and style. Explore our curated collection of clothing and accessories to elevate your wardrobe.  ",
+  description: "Welcome to Clothese, your ultimate destination for fashion and style.",
 };
 
 export default function RootLayout({
@@ -32,22 +30,22 @@ export default function RootLayout({
       lang="ar" 
       dir="rtl"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning // 🎯 2. Évite les alertes de conflits serveur/client dans votre console de développement
     >
+      {/* 💡 Note : Les variables bg-background et text-foreground s'appliquent automatiquement grâce à notre CSS global */}
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Nav/>
-          
-          {children}
-
-          <Footer/>
+          {/* 🎯 3. Injection du ThemeProvider configuré sur le mode classe pour Tailwind v4 */}
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            {children} 
+          </ThemeProvider>
         </AuthProvider>
 
-        {/* 👈 2. Add Toaster component with Dark Theme & RTL support */}
         <Toaster 
           theme="dark" 
           dir="rtl" 
-          position="bottom-left" // Standard corner positioning for RTL environments
-          richColors // Gives elegant colors to success/error notifications
+          position="bottom-left" 
+          richColors 
         />
       </body>
     </html>

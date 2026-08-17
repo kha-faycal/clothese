@@ -16,13 +16,18 @@ export async function POST(request: Request) {
     const uploadResult = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
-          folder: "categories", // Fixed typo 'categorys' to standard english
+          folder: "categories", 
           resource_type: "auto", 
-           timeout: 120000,
+          timeout: 120000,
+          // 🚀 إضافة إعدادات الضغط والتحويل التلقائي إلى صيغة WebP الخفيفة جداً
+          format: "webp", 
+          transformation: [
+            { quality: "auto" },  // ضغط ذكي بدون خسارة الجودة المرئية
+            { width: 1000, height: 1000, crop: "limit" } // منع رفع صور ضخمة لحفظ مساحة حسابك
+          ]
         },
         (error, result) => {
           if (error) {
-            // This logs the precise Cloudinary API configuration error to your terminal console
             console.error("❌ Cloudinary Internal Error Details:", error);
             reject(error);
           } else {

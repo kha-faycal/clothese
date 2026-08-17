@@ -51,14 +51,15 @@ export default function OrdersManager() {
 
   const handleStatusChange = async (orderId: number, newStatus: string) => {
     try {
-      const res = await fetch("/api/admin/orders", {
+      // Ajusté sur la route unifiée /api/orders
+      const res = await fetch("/api/orders", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId, status: newStatus }),
       });
       if (res.ok) {
         toast.success("Statut de la commande mis à jour !");
-        fetchOrders(); // Rafraîchir les données
+        fetchOrders();
       } else {
         toast.error("Erreur lors de la modification");
       }
@@ -67,7 +68,6 @@ export default function OrdersManager() {
     }
   };
 
-  // Couleurs conditionnelles selon l'avancement du cycle de vente
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "PENDING": return "bg-amber-500/20 text-amber-400 border-amber-500/30";
@@ -112,17 +112,17 @@ export default function OrdersManager() {
               <div className="flex-1 flex flex-col gap-2 w-full border-t border-b lg:border-none border-gray-900 py-3 lg:py-0">
                 {order.orderItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 bg-gray-900/30 p-2 rounded-lg border border-gray-900/60 w-full">
-                    <img src={item.variant.image?.[0] || "/placeholder.jpg"} alt="" className="w-10 h-10 object-cover rounded-md border border-gray-800" />
+                    <img src={item.variant?.image?.[0] || "/placeholder.jpg"} alt="" className="w-10 h-10 object-cover rounded-md border border-gray-800" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{item.variant.product?.Name}</p>
-                      <p className="text-[10px] text-gray-400">اللون: {item.variant.color} | المقاس: {item.variant.size} | الكمية: <span className="font-bold text-white">{item.quantity}</span></p>
+                      <p className="text-xs font-bold text-white truncate">{item.variant?.product?.Name}</p>
+                      <p className="text-[10px] text-gray-400">اللون: {item.variant?.color} | المقاس: {item.variant?.size} | الكمية: <span className="font-bold text-white">{item.quantity}</span></p>
                     </div>
                     <div className="text-left font-mono text-xs font-bold text-gray-300 pl-1">{item.price * item.quantity} DZD</div>
                   </div>
                 ))}
               </div>
 
-              {/* Prix total & Changement du Statut de traitement */}
+              {/* Prix total & Changement du Statut */}
               <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 w-full lg:w-auto min-w-[160px]">
                 <div className="text-right">
                   <span className="text-[10px] text-gray-500 block">المبلغ الإجمالي</span>

@@ -118,13 +118,7 @@ export default function LoginPage() {
           </div>
         </form>
 
-        {/* Link to Registration */}
-        <p className="mt-10 text-center text-sm text-[var(--muted)]">
-          ليس لديك حساب؟{" "}
-          <Link href="/register" className="font-semibold leading-6 text-[var(--primary)] hover:text-red-400 transition-colors">
-            إنشاء حساب جديد من هنا
-          </Link>
-        </p>
+       
       </div>
     </div>
   );
