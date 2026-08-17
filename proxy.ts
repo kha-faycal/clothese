@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-// 🚀 Version 16.x : Export nommé obligatoire avec le nom "proxy"
+// 🚀 Nouvelle norme Next.js 16 : La fonction doit obligatoirement s'appeler "proxy"
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Lecture du token JWT (S'exécute désormais sur le runtime Node.js par défaut)
+  // Lecture du token JWT sécurisé de NextAuth (s'exécute sur le Runtime Node.js stable)
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
