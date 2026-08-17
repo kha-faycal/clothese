@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/app/generated/prisma";
 // --- FONCTIONS DE MAPPING POUR LES ENUMS PRISMA ---
 function getMappedGender(gender: string): 'men' | 'women' | 'kids' | 'unisex' {
   const cleanGender = (gender || "").toLowerCase().trim();
