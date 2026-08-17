@@ -30,10 +30,11 @@ function getMappedProductType(type: string): 'CLOTHES' | 'PERFUME' | 'COSMETICS'
 // 🟢 GET : Récupérer un produit spécifique par son Slug (Uniquement s'il a du stock > 0)
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> } // ✅ Correction du typage asynchrone Next.js 16
 ) {
   try {
-    const { slug } = params;
+    // ✅ Résolution obligatoire de la promesse pour extraire le slug sans crash
+    const { slug } = await params;
 
     const product = await prisma.product.findUnique({
       where: { 
@@ -59,7 +60,7 @@ export async function GET(
   }
 }
 
-// 🔵 POST : Créer un produit (Inclus par défaut pour la compatibilité de structure globale)
+// 🔵 POST : Créer un produit
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -128,7 +129,7 @@ export async function POST(request: Request) {
   }
 }
 
-// 🟠 PUT : Mettre à jour un produit existant de manière sécurisée (Sans deleteMany global sur variantes)
+// 🟠 PUT : Mettre à jour un produit existant de manière sécurisée (Sans deleteMany global)
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
