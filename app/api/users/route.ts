@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth"; // ✅ Correction de l'import pour cibler votre fichier racine central
+import { authOptions } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
-// Fonction utilitaire interne pour sécuriser l'accès aux routes d'administration
 async function checkAdminAuth() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
@@ -16,15 +15,14 @@ async function checkAdminAuth() {
 // 🟢 GET : Récupérer tous les utilisateurs
 export async function GET() {
   try {
-    await checkAdminAuth(); // Optionnel : Bloque la lecture si non connecté
+    await checkAdminAuth();
     const users = await prisma.user.findMany({
       orderBy: { name: "asc" },
       select: {
         id: true,
         name: true,
         email: true,
-        emailVerified: true,
-        image: true,
+        image: true, // ✅ Nettoyé : emailVerified retiré pour correspondre au schéma propre
       }
     });
     return NextResponse.json(users, { status: 200 });
@@ -40,7 +38,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password, image, isVerified } = body;
+    const { name, email, password, image } = body;
 
     if (!email) {
       return NextResponse.json({ error: "L'adresse email est obligatoire." }, { status: 400 });
@@ -56,8 +54,7 @@ export async function POST(request: Request) {
         name: name || null,
         email: email.toLowerCase().trim(),
         image: image || null,
-        password: hashedPassword,
-        emailVerified: isVerified ? new Date() : null,
+        password: hashedPassword || "",
       },
     });
 
@@ -76,7 +73,7 @@ export async function POST(request: Request) {
   }
 }
 
-// 🟠 PUT : Mettre à jour un utilisateur existant
+// 🟠 PUT : Mettre à jour un utilisateur existant (Vue de masse Admin)
 export async function PUT(request: Request) {
   try {
     await checkAdminAuth();
@@ -125,7 +122,6 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Utilisateur introuvable." }, { status: 404 });
     }
 
-    // Sécurité critique : Empêche un administrateur connecté de s'auto-supprimer
     if (userToDelete.email?.toLowerCase() === session.user.email?.toLowerCase()) {
       return NextResponse.json(
         { error: "Sécurité : Vous ne pouvez pas supprimer votre propre compte lorsqu'il est connecté." }, 
