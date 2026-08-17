@@ -14,8 +14,7 @@ function LoginFormContent() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
-
+const callbackUrl = searchParams.get("callbackUrl") || "/shop/dashboard";
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
