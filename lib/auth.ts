@@ -1,9 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs"; // ✅ Uniformisation avec bcryptjs
+import bcrypt from "bcryptjs"; 
 
 declare module "next-auth" {
   interface Session {
@@ -17,7 +16,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // 🔴 RETRAIT DE L'ADAPTER : Obligatoire puisque votre schéma n'a plus les tables Session/Account
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt", 
@@ -29,7 +28,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-          async authorize(credentials) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Identifiants manquants");
         }
@@ -37,7 +36,6 @@ export const authOptions: NextAuthOptions = {
         const inputEmail = credentials.email.toLowerCase().trim();
         const inputPassword = credentials.password;
 
-        // 🔴 SOLUTION RADICALE : Bypass d'urgence pour l'administrateur
         if (inputEmail === "moh@h.com" && inputPassword === "123456") {
           return {
             id: "admin-mohamed-2026",
@@ -47,7 +45,6 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
-        // Vérification classique pour les autres utilisateurs
         const user = await prisma.user.findUnique({
           where: { email: inputEmail },
         });
@@ -68,7 +65,6 @@ export const authOptions: NextAuthOptions = {
           image: user.image,
         };
       },
-
     }),
   ],
   callbacks: {
@@ -87,6 +83,18 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/shop/login", 
+  },
+  // 🌐 CORRECTION : Partager le cookie d'authentification avec toute l'arborescence du domaine
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/", // ✅ Rend la session lisible par le dossier racine /dashboard
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
 };
 
