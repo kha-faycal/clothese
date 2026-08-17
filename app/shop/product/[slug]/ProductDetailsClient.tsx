@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useCartStore } from "../../store/useCartStore";
 import { toast } from "sonner";
 import CartDrawer from "@/components/CartDrawer";
-import FacebookShareButton from "@/components/FacebookShareButton";
 import { CldImage } from "next-cloudinary"; 
 
 interface Variant {
@@ -34,7 +33,7 @@ interface Product {
   Slug: string;
   brand: string;
   Description: string;
-  type: "CLOTHES" | "PERFUME" | "COSMETICS"; // Prise en charge du type
+  type: "CLOTHES" | "PERFUME" | "COSMETICS"; 
   gender: string;
   season?: string | null;
   category?: Category;
@@ -84,11 +83,9 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
     });
   };
 
-  // Regrouper les variantes par caractéristiques pour affichage dynamique
   const distinctSizes = Array.from(new Set(variants.map(v => v.size).filter(Boolean)));
   const distinctColors = Array.from(new Set(variants.map(v => v.color).filter(Boolean)));
 
-  // Gérer le changement de choix dynamique
   const handleSelectSpecs = (size: string, color: string) => {
     const idx = variants.findIndex(v => v.size === size && v.color === color);
     if (idx !== -1) setSelectedVariantIdx(idx);
@@ -216,12 +213,12 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
           <button
             onClick={handleAddToCart}
             disabled={!currentVariant || currentVariant.stock <= 0}
-            className="w-full bg-white text-black hover:bg-gray-200 font-bold py-4 rounded-xl shadow-lg transition-all disabled:bg-gray-900 disabled:text-gray-600 disabled:cursor-not-allowed"
+            className="w-full bg-white text-black hover:bg-gray-200 font-bold py-4 rounded-xl shadow-lg transition-all disabled:bg-gray-900 disabled:text-gray-600 disabled:cursor-not-allowed cursor-pointer"
           >
             {currentVariant?.stock > 0 ? "إضافة إلى سلة التسوق" : "نفدت الكمية"}
           </button>
 
-          {/* ℹ️ SPECIFIC ATTRIBUTES DISPLAY */}
+                    {/* ℹ️ SPECIFIC ATTRIBUTES DISPLAY */}
           {product.attributes && product.attributes.length > 0 && (
             <div className="mt-4 bg-gray-950 p-4 rounded-xl border border-gray-900">
               <h3 className="text-sm font-bold text-gray-300 mb-3">تفاصيل ومميزات المنتج :</h3>
@@ -242,9 +239,18 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
             <p className="whitespace-pre-line">{product.Description}</p>
           </div>
 
+          {/* ✅ SECTION DE PARTAGE NATIVE SÉCURISÉE SANS ERREUR TYPESCRIPT */}
           <div className="flex items-center gap-2 mt-4">
-            <FacebookShareButton url={`/product/${product.Slug}`} />
+            <a
+              href={`https://facebook.com{encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+            >
+              🌐 مشاركة عبر فيسبوك (Partager)
+            </a>
           </div>
+
         </div>
       </div>
     </main>
