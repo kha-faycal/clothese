@@ -110,8 +110,10 @@ export default function ProductsManager() {
     const filteredAttributes = attributes.filter(attr => attr.name && attr.value)
     
     const payload = {
-      ...(editingProductId && { id: editingProductId }),
+      ...(editingProductId && { id: editingProductId }), // Clé ID ajoutée si modification
       ...product,
+      // ✅ CORRECTION CRITIQUE : Cast explicite pour correspondre à l'énumération TypeScript
+      type: product.type as "CLOTHES" | "PERFUME" | "COSMETICS",
       slug: product.name.toLowerCase().replace(/\s+/g, "-"),
       variants,
       attributes: filteredAttributes
