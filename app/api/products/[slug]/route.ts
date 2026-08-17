@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+
 // --- FONCTIONS DE MAPPING POUR LES ENUMS PRISMA ---
 function getMappedGender(gender: string): 'men' | 'women' | 'kids' | 'unisex' {
   const cleanGender = (gender || "").toLowerCase().trim();
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
             barcode: v.barcode || `${Date.now()}-${Math.random()}`,
             price: parseFloat(v.price || 0),
             stock: parseInt(v.stock || 0),
-            weight: new Prisma.Decimal(v.weight || 0), 
+            weight: parseFloat(v.weight || 0), // ✅ Corrigé : Plus besoin du namespace Prisma.Decimal interne
             image: Array.isArray(v.image) ? v.image : [], 
           })),
         },
@@ -116,7 +117,7 @@ export async function POST(request: Request) {
     );
 
   } catch (error: any) {
-    console.error("Erreur Prisma Produit POST:", error);
+    console.error("Erreur Prisma Product POST:", error);
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Un produit avec ce Slug, ou un SKU/Code-barre de variante existe déjà." },
@@ -187,7 +188,7 @@ export async function PUT(request: Request) {
           barcode: v.barcode || `${Date.now()}-${Math.random()}`,
           price: parseFloat(v.price || 0),
           stock: parseInt(v.stock || 0),
-          weight: new Prisma.Decimal(v.weight || 0), 
+          weight: parseFloat(v.weight || 0), // ✅ Corrigé
           image: Array.isArray(v.image) ? v.image : [],
         };
 
@@ -250,14 +251,10 @@ export async function DELETE(request: Request) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: "L'identifiant 'id' est requis en paramètre d'URL." }, { status: 400 });
+      return NextResponse.json({ error: "L'identifiant 'id' est requis." }, { status: 400 });
     }
 
     const productId = parseInt(id);
-    
-    if (isNaN(productId)) {
-      return NextResponse.json({ error: "L'identifiant fourni n'est pas un nombre valide." }, { status: 400 });
-    }
 
     await prisma.$transaction([
       prisma.variant.deleteMany({ where: { productId } }),
@@ -268,6 +265,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ message: "Produit supprimé avec succès !" }, { status: 200 });
   } catch (error: any) {
     console.error("Erreur Prisma DELETE Produit:", error);
-    return NextResponse.json({ error: "Erreur lors de la suppression du produit." }, { status: 500 });
+    return NextResponse.json({ error: "Erreur lors de la suppression." }, { status: 500 });
   }
 }
