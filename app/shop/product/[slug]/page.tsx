@@ -27,7 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const productDescription = product.Description || "اكتشف منتجاتنا الحصرية والمميزة على متجرنا الإلكتروني.";
   
   // Correction extraction prix : fallback sur product.price si la variante n'a pas de prix
-  const currentPrice = product.variants?.[0]?.price ? Number(product.variants[0].price) : (product.price ? Number(product.price) : 0);
+  // Extrait le prix de la première variante. Si aucune variante n'existe, retourne 0.
+  const currentPrice = product.variants?.[0]?.price ? Number(product.variants[0].price) : 0;
   const mainImage = product.variants?.[0]?.image?.[0];
 
   // Domaine officiel de production configuré en dur par défaut pour les partages
