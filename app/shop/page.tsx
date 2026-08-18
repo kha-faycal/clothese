@@ -113,8 +113,8 @@ export default function HomePage() {
           <div className="hidden md:col-span-5 md:flex justify-end relative">
   <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
     <Image
-                src="https://res-console.cloudinary.com/ddqiz9p1/thumbnails/v1/image/upload/v1787033668/NzcxOTgzNzE5XzI5MzEwNDk0OTcyNzQ5NzFfNTAwMzkwOTk4MjQxODE4ODY3MV9uX3B3bnFkeQ==/drilldown"
-                width={288} // correspond à w-72
+src="https://res.cloudinary.com/dtz0urit6/image/upload/q_auto:best,f_jpg/cloudinary-tools-uploads/ckqjxjofz1bp1cqb8cyz"              
+  width={288} // correspond à w-72
                 height={384} // correspond à h-96
                 className="object-cover rounded-3xl"
                 priority alt={""}    />
