@@ -92,11 +92,16 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
   };
 
   // 🎯 FONCTION DE PARTAGE FACEBOOK SÉCURISÉE EN MODE CLIENT
-  const handleFacebookShare = (e: React.MouseEvent) => {
+    const handleFacebookShare = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // 1. Récupère l'URL propre de la page produit actuelle
     const currentUrl = window.location.href;
+    
+    // 2. 🔥 CORRECTION : Utilisation impérative de ` et de ${} 
     const facebookShareUrl = `https://facebook.com{encodeURIComponent(currentUrl)}`;
 
+    // 3. Configuration géométrique standard du Pop-up
     const width = 600;
     const height = 450;
     const left = window.screen.width / 2 - width / 2;
@@ -108,6 +113,7 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
       `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
     );
   };
+
 
   return (
     <main className="w-full min-h-screen bg-black text-white antialiased py-6 md:py-12 px-4 sm:px-6 lg:px-8" dir="rtl">
