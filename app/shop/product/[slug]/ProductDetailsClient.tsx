@@ -4,6 +4,7 @@ import { useCartStore } from "../../store/useCartStore";
 import { toast } from "sonner";
 import CartDrawer from "@/components/CartDrawer";
 import { CldImage } from "next-cloudinary"; 
+import FacebookShareButton from "@/components/FacebookShareButton"; // 🎯 Importation du bouton de partage
 
 interface Variant {
   id: number;
@@ -139,7 +140,7 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
           )}
         </div>
 
-        {/* 📝 SECTION DROITE : DETAILS ET LOGIQUE DYNAMIQUE */}
+        {/* 📝 SECTION DROITE : DETAILS ET ACTION */}
         <div className="flex flex-col gap-6 w-full">
           <div>
             <span className="text-xs text-gray-500 uppercase tracking-wider">{product.category?.Name}</span>
@@ -149,9 +150,16 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
 
           <hr className="border-gray-900" />
 
+          {/* Descriptif Produit */}
+          {product.Description && (
+            <div className="text-sm text-gray-400 leading-relaxed">
+              <p>{product.Description}</p>
+            </div>
+          )}
+
           {/* 🌟 LOGIQUE INTERFACE ADAPTATIVE */}
           <div className="flex flex-col gap-4">
-            {/* 1. Gestion des Tailles / Contenances */}
+            {/* 1. Gestion des Tailles */}
             {distinctSizes.length > 0 && (
               <div>
                 <label className="text-sm font-medium text-gray-400 block mb-2">
@@ -162,7 +170,7 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
                     <button
                       key={size}
                       onClick={() => handleSelectSpecs(size, currentVariant?.color)}
-                      className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
                         currentVariant?.size === size
                           ? "bg-white text-black border-white"
                           : "bg-transparent text-white border-gray-800 hover:border-gray-600"
@@ -175,7 +183,7 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
               </div>
             )}
 
-            {/* 2. Gestion des Couleurs / Teintes */}
+            {/* 2. Gestion des Couleurs */}
             {distinctColors.length > 0 && (
               <div className="mt-2">
                 <label className="text-sm font-medium text-gray-400 block mb-2">
@@ -186,7 +194,7 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
                     <button
                       key={color}
                       onClick={() => handleSelectSpecs(currentVariant?.size, color)}
-                      className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
                         currentVariant?.color === color
                           ? "bg-white text-black border-white"
                           : "bg-transparent text-white border-gray-800 hover:border-gray-600"
@@ -209,49 +217,24 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
             )}
           </div>
 
-          {/* زر الإضافة إلى السلة */}
-          <button
-            onClick={handleAddToCart}
-            disabled={!currentVariant || currentVariant.stock <= 0}
-            className="w-full bg-white text-black hover:bg-gray-200 font-bold py-4 rounded-xl shadow-lg transition-all disabled:bg-gray-900 disabled:text-gray-600 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {currentVariant?.stock > 0 ? "إضافة إلى سلة التسوق" : "نفدت الكمية"}
-          </button>
-
-                    {/* ℹ️ SPECIFIC ATTRIBUTES DISPLAY */}
-          {product.attributes && product.attributes.length > 0 && (
-            <div className="mt-4 bg-gray-950 p-4 rounded-xl border border-gray-900">
-              <h3 className="text-sm font-bold text-gray-300 mb-3">تفاصيل ومميزات المنتج :</h3>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                {product.attributes.map((attr) => (
-                  <div key={attr.id} className="border-b border-gray-900 pb-2">
-                    <span className="text-gray-500 block mb-0.5">{attr.name}</span>
-                    <span className="text-gray-200 font-medium">{attr.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* وصف المنتج الأساسي */}
-          <div className="mt-2 text-sm leading-relaxed text-gray-400">
-            <h3 className="text-white font-bold mb-1">وصف المنتج :</h3>
-            <p className="whitespace-pre-line">{product.Description}</p>
-          </div>
-
-          {/* ✅ SECTION DE PARTAGE NATIVE SÉCURISÉE SANS ERREUR TYPESCRIPT */}
-          <div className="flex items-center gap-2 mt-4">
-            <a
-              href={`https://facebook.com{encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm cursor-pointer"
+          {/* 🛒 ZONE D'ACTIONS : AJOUT PANIER & PARTAGE FACEBOOK */}
+          <div className="flex flex-col gap-3 mt-4">
+            <button
+              onClick={handleAddToCart}
+              disabled={!currentVariant || currentVariant.stock <= 0}
+              className="w-full bg-white text-black hover:bg-gray-200 disabled:bg-gray-900 disabled:text-gray-600 font-bold py-4 rounded-xl shadow-lg transition-all cursor-pointer disabled:cursor-not-allowed text-center text-sm"
             >
-              🌐 مشاركة عبر فيسبوك (Partager)
-            </a>
-          </div>
+              {!currentVariant || currentVariant.stock <= 0 ? "نفد من المخزن" : "إضافة إلى السلة"}
+            </button>
 
+            {/* 🔥 Intégration du bouton de partage FB optimisé */}
+            <FacebookShareButton 
+              slug={product.Slug} 
+              buttonText="مشاركة هذا المنتج على فيسبوك" 
+            />
+          </div>
         </div>
+
       </div>
     </main>
   );
