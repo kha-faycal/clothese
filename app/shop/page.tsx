@@ -110,17 +110,17 @@ export default function HomePage() {
             </div>
           </div>
 
-           <div className="hidden md:col-span-5 md:flex justify-end relative">
-          <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
-            <img
-              src="https://cloudinary.com"              
-              width={288} 
-              height={384} 
-              className="object-cover rounded-3xl"
-              alt="Anaka Shop Logo"   
-            />
-          </div>
-        </div>
+          <div className="hidden md:col-span-5 md:flex justify-end relative">
+  <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
+    <Image
+      src="/them.jpg" // Indique que l'image est à la racine du dossier public
+      width={288} 
+      height={384} 
+      className="object-cover rounded-3xl"
+      alt="Anaka Shop Logo"   
+    />
+  </div>
+</div>
         </div>
       </section>
 
