@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import CartDrawer from "@/components/CartDrawer";
 import { useCartStore } from "./store/useCartStore";
-import Image from "next/image";
+import { CldImage } from 'next-cloudinary';
 
 export default function HomePage() {
   const [products, setProducts] = useState<any[]>([]);
