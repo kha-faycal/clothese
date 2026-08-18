@@ -111,17 +111,16 @@ export default function HomePage() {
           </div>
 
         <div className="hidden md:col-span-5 md:flex justify-end relative">
-      <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
-        <CldImage
-          src="cloudinary-tools-uploads/ckqjxjofz1bp1cqb8cyz" // Utilisez uniquement l'ID public de l'image
-          width="288"
-          height="384"
-          className="object-cover rounded-3xl"
-          priority
-          alt="Hero Section Image"
-        />
-      </div>
-    </div>
+  <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
+    <img
+      src="https://cloudinary.com"              
+      width={288} 
+      height={384} 
+      className="object-cover rounded-3xl"
+      alt="Hero Section Image"   
+    />
+  </div>
+</div>
 
         </div>
       </section>
