@@ -110,14 +110,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="hidden md:col-span-5 md:flex justify-end relative">
+         <div className="hidden md:col-span-5 md:flex justify-end relative">
   <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
     <Image
-src="https://res.cloudinary.com/dtz0urit6/image/upload/q_auto:best,f_jpg/cloudinary-tools-uploads/ckqjxjofz1bp1cqb8cyz"              
-  width={288} // correspond à w-72
-                height={384} // correspond à h-96
-                className="object-cover rounded-3xl"
-                priority alt={""}    />
+      src="https://cloudinary.com"              
+      width={288} // correspond à w-72
+      height={384} // correspond à h-96
+      className="object-cover rounded-3xl"
+      priority 
+      alt="Hero Section Image"   
+    />
   </div>
 </div>
 
