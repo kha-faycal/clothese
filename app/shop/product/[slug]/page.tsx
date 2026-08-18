@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- * 🌎 GENERATE METADATA FOR FACEBOOK CRAWLERS
+ * 🌎 GENERATE METADATA FOR FACEBOOK & WHATSAPP CRAWLERS
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: rawSlug } = await params;
@@ -25,24 +25,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const productName = product.Name;
   const productDescription = product.Description || "اكتشف منتجاتنا الحصرية والمميزة على متجرنا الإلكتروني.";
-  const currentPrice = product.variants?.[0]?.price || 0;
+  
+  // Correction extraction prix : fallback sur product.price si la variante n'a pas de prix
+  const currentPrice = product.variants?.[0]?.price ? Number(product.variants[0].price) : (product.price ? Number(product.price) : 0);
   const mainImage = product.variants?.[0]?.image?.[0];
 
-  const productionDomain = process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+  // Domaine officiel de production configuré en dur par défaut pour les partages
+  const productionDomain = process.env.NEXT_PUBLIC_SITE_URL || "https://saidati.me";
   
+  // Résolution propre de l'adresse de l'image (Cloudinary externe ou locale)
   const absoluteImageUrl = mainImage && mainImage.startsWith("http") 
     ? mainImage 
-    : `${productionDomain}${mainImage || "/default-og-image.jpg"}`;
+    : `${productionDomain}${mainImage || "/them.jpg"}`;
 
   return {
-    title: `${productName} | ${product.brand || "متجرنا"}`,
-    description: `${productDescription} - السعر: ${currentPrice} DZD`,
+    title: `${productName} | ${product.brand || "Anaka Shop"}`,
+    description: `${productDescription} - السعر: ${currentPrice} دج`,
     openGraph: {
       title: productName,
-      description: `${productDescription} - السعر الحالي: ${currentPrice} DZD`,
-      url: `${productionDomain}/product/${rawSlug}`,
-      siteName: "اسم المتجر الخاص بك",
-      type: "website",
+      description: `${productDescription} - السعر الحالي: ${currentPrice} دج`,
+      // 🛠️ Ajustement du chemin exact d'URL selon votre arborescence physique /shop/product
+      url: `${productionDomain}/shop/product/${rawSlug}`,
+      siteName: "Anaka Shop",
+      type: "article", // Type article idéal pour la mise en valeur des fiches produits de e-commerce
       images: [
         {
           url: absoluteImageUrl,
