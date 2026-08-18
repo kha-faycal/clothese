@@ -2,28 +2,26 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function proxy(request: NextRequest) {
+// ⚠️ Utilisation de export default pour garantir la prise en compte par Next.js 16
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // 🔴 BYPASS INITIAL : Laisse passer l'accès direct le temps de stabiliser le cookie
-  if (pathname === "/dashboard") {
-    return NextResponse.next();
-  }
 
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  if (pathname.startsWith("/dashboard") && !token) {
-    const loginUrl = new URL("/shop/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+  if (pathname.startsWith("/dashboard")) {
+    if (!token) {
+      const loginUrl = new URL("/shop/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard", "/dashboard/:path*"],
 };
