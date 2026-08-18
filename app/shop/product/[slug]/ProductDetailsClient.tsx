@@ -4,7 +4,6 @@ import { useCartStore } from "../../store/useCartStore";
 import { toast } from "sonner";
 import CartDrawer from "@/components/CartDrawer";
 import { CldImage } from "next-cloudinary"; 
-import FacebookShareButton from "@/components/FacebookShareButton"; // 🎯 Importation du bouton de partage
 
 interface Variant {
   id: number;
@@ -90,6 +89,24 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
   const handleSelectSpecs = (size: string, color: string) => {
     const idx = variants.findIndex(v => v.size === size && v.color === color);
     if (idx !== -1) setSelectedVariantIdx(idx);
+  };
+
+  // 🎯 FONCTION DE PARTAGE FACEBOOK SÉCURISÉE EN MODE CLIENT
+  const handleFacebookShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const currentUrl = window.location.href;
+    const facebookShareUrl = `https://facebook.com{encodeURIComponent(currentUrl)}`;
+
+    const width = 600;
+    const height = 450;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
+    window.open(
+      facebookShareUrl,
+      "FacebookSharePopup",
+      `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+    );
   };
 
   return (
@@ -217,24 +234,28 @@ export default function ProductDetailsClient({ initialProduct }: { initialProduc
             )}
           </div>
 
-          {/* 🛒 ZONE D'ACTIONS : AJOUT PANIER & PARTAGE FACEBOOK */}
+          {/* 🛒 ZONE DE COMMANDE COMPLETÉE */}
           <div className="flex flex-col gap-3 mt-4">
             <button
               onClick={handleAddToCart}
               disabled={!currentVariant || currentVariant.stock <= 0}
-              className="w-full bg-white text-black hover:bg-gray-200 disabled:bg-gray-900 disabled:text-gray-600 font-bold py-4 rounded-xl shadow-lg transition-all cursor-pointer disabled:cursor-not-allowed text-center text-sm"
+              className="w-full bg-white text-black hover:bg-gray-200 font-bold py-4 rounded-xl shadow-lg transition-all disabled:bg-gray-900 disabled:text-gray-600 disabled:cursor-not-allowed cursor-pointer text-center text-sm"
             >
               {!currentVariant || currentVariant.stock <= 0 ? "نفد من المخزن" : "إضافة إلى السلة"}
             </button>
 
-            {/* 🔥 Intégration du bouton de partage FB optimisé */}
-            <FacebookShareButton 
-              slug={product.Slug} 
-              buttonText="مشاركة هذا المنتج على فيسبوك" 
-            />
+            {/* 🔥 BOUTON DE PARTAGE FACEBOOK NATIF CORRIGÉ */}
+            <button
+              onClick={handleFacebookShare}
+              className="w-full bg-[#1877F2] text-white hover:bg-[#166FE5] font-bold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer text-sm active:scale-95"
+            >
+              <svg xmlns="http://w3.org" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99H7.9v-2.89h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.89h-2.34v6.99C18.34 21.13 22 17 22 12z"/>
+              </svg>
+              <span>بارطاجي في فيسبوك</span>  
+            </button>
           </div>
         </div>
-
       </div>
     </main>
   );
