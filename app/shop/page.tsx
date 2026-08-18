@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import CartDrawer from "@/components/CartDrawer";
 import { useCartStore } from "./store/useCartStore";
@@ -112,7 +113,7 @@ export default function HomePage() {
 
         <div className="hidden md:col-span-5 md:flex justify-end relative">
   <div className="w-72 h-96 bg-secondary/50 border border-border rounded-3xl shadow-2xl relative overflow-hidden flex items-center justify-center">
-    <img
+    <Image
       src="https://cloudinary.com"              
       width={288} 
       height={384} 
