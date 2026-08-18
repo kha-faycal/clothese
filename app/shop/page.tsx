@@ -118,7 +118,8 @@ export default function HomePage() {
       width={288} 
       height={384} 
       className="object-cover rounded-3xl"
-      alt="Hero Section Image"   
+      priority 
+      alt="Anaka Shop Logo"   
     />
   </div>
 </div>
