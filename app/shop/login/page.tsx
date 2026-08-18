@@ -36,8 +36,8 @@ const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
         toast.error(result.error === "CredentialsSignin" ? "البريد الإلكتروني أو كلمة المرور غير صحيحة" : result.error);
       } else {
         toast.success("تم تسجيل الدخول بنجاح! جاري تحويلك...");
-        router.refresh();
-        router.push(callbackUrl);
+                window.location.href = callbackUrl;
+
       }
     } catch (err) {
       console.error("Login component submission error:", err);
